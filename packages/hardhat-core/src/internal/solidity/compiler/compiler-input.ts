@@ -12,6 +12,8 @@ export function getInputFromCompilationJob(
 
   const { settings } = compilationJob.getSolcConfig();
 
+  console.log(JSON.stringify(settings, null, 2));
+
   return {
     language: "Solidity",
     sources,

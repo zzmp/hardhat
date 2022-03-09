@@ -39,6 +39,37 @@ export class CompilationJob implements taskTypes.CompilationJob {
   public addFileToCompile(file: ResolvedFile, emitsArtifacts: boolean) {
     const fileToCompile = this._filesToCompile.get(file.sourceName);
 
+    if (this.solidityConfig.settings?.outputSelection === undefined) {
+      this.solidityConfig.settings.outputSelection = {};
+    }
+
+    if (this.solidityConfig.settings.outputSelection["*"] !== undefined) {
+      delete this.solidityConfig.settings.outputSelection["*"];
+    }
+
+    if (
+      this.solidityConfig.settings.outputSelection[file.sourceName] ===
+      undefined
+    ) {
+      if (emitsArtifacts) {
+        this.solidityConfig.settings.outputSelection[file.sourceName] = {
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata",
+          ],
+          "": ["ast"],
+        };
+      } else {
+        this.solidityConfig.settings.outputSelection[file.sourceName] = {
+          "*": ["abi", "evm.methodIdentifiers", "metadata"],
+          "": ["ast"],
+        };
+      }
+    }
+
     // if the file doesn't exist, we add it
     // we also add it if emitsArtifacts is true, to override it in case it was
     // previously added but with a false emitsArtifacts
@@ -190,6 +221,25 @@ export async function createCompilationJobFromFile(
   log(
     `File '${file.absolutePath}' will be compiled with version '${compilerConfig.version}'`
   );
+
+  // const newConfig = {
+  //   version: compilerConfig.version,
+  //   settings: {
+  //     ...compilerConfig.settings,
+  //     outputSelection: {
+  //       [file.sourceName]: {
+  //         "*": [
+  //           "abi",
+  //           "evm.bytecode",
+  //           "evm.deployedBytecode",
+  //           "evm.methodIdentifiers",
+  //           "metadata",
+  //         ],
+  //         "": ["ast"],
+  //       },
+  //     },
+  //   },
+  // };
 
   const compilationJob = new CompilationJob(compilerConfig);
 
