@@ -6,6 +6,10 @@ export class EthersProviderWrapper extends ethers.providers.JsonRpcProvider {
 
   constructor(hardhatProvider: EthereumProvider) {
     super();
+    
+    // Reduce the polling interval so that event polling does not hang tests.
+    this._pollingInterval = 50;
+    
     this._hardhatProvider = hardhatProvider;
   }
 
