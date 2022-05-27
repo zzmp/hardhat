@@ -9,6 +9,11 @@ export class EthersProviderWrapper extends ethers.providers.JsonRpcProvider {
     this._hardhatProvider = hardhatProvider;
   }
 
+  public close(): Promise<void> {
+    this.removeAllListeners();
+    return this.poll();
+  }
+
   public async send(method: string, params: any): Promise<any> {
     const result = await this._hardhatProvider.send(method, params);
 

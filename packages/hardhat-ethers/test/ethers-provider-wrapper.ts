@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { assert } from "chai";
 import { ethers } from "ethers";
 
@@ -43,5 +47,13 @@ describe("Ethers provider wrapper", function () {
         assert.deepEqual(err2.message, err.message);
       }
     }
+  });
+
+  it.only("Should clean up _poller at close", async function () {
+    wrapper.on("block", (e) => console.log(e));
+    assert.exists(wrapper._poller);
+
+    await wrapper.close();
+    assert.notExists(wrapper._poller);
   });
 });
